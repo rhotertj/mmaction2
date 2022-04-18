@@ -9,7 +9,7 @@ import numpy as np
 from mmcv.utils import digit_version
 from torch.nn.modules.utils import _pair
 
-from ..builder import PIPELINES
+from ..builder import TRANSFORMS
 from .formatting import to_tensor
 
 
@@ -55,7 +55,7 @@ def _init_lazy_if_proper(results, lazy):
         assert 'lazy' not in results, 'Use Fuse after lazy operations'
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class TorchvisionTrans:
     """Torchvision Augmentations, under torchvision.transforms.
 
@@ -92,7 +92,7 @@ class TorchvisionTrans:
         return results
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class PytorchVideoTrans:
     """PytorchVideoTrans Augmentations, under pytorchvideo.transforms.
 
@@ -164,7 +164,7 @@ class PytorchVideoTrans:
         return results
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class PoseCompact:
     """Convert the coordinates of keypoints to make it more compact.
     Specifically, it first find a tight bounding box that surrounds all joints
@@ -267,7 +267,7 @@ class PoseCompact:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class Imgaug:
     """Imgaug augmentation.
 
@@ -507,7 +507,7 @@ class Imgaug:
         return results
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class Fuse:
     """Fuse lazy operations.
 
@@ -551,7 +551,7 @@ class Fuse:
         return results
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class RandomCrop:
     """Vanilla square random crop that specifics the output size.
 
@@ -697,7 +697,7 @@ class RandomCrop:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class RandomResizedCrop(RandomCrop):
     """Random crop that specifics the area and height-weight ratio range.
 
@@ -857,7 +857,7 @@ class RandomResizedCrop(RandomCrop):
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class MultiScaleCrop(RandomCrop):
     """Crop images with a list of randomly selected scales.
 
@@ -1036,7 +1036,7 @@ class MultiScaleCrop(RandomCrop):
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class Resize:
     """Resize images to a specific size.
 
@@ -1166,7 +1166,7 @@ class Resize:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class RandomRescale:
     """Randomly resize images so that the short_edge is resized to a specific
     size in a given range. The scale ratio is unchanged after resizing.
@@ -1219,7 +1219,7 @@ class RandomRescale:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class Flip:
     """Flip the input images with a probability.
 
@@ -1366,7 +1366,7 @@ class Flip:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class Normalize:
     """Normalize images with the given mean and std value.
 
@@ -1452,7 +1452,7 @@ class Normalize:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class ColorJitter:
     """Perform ColorJitter to each img.
 
@@ -1549,7 +1549,7 @@ class ColorJitter:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class CenterCrop(RandomCrop):
     """Crop the center area from images.
 
@@ -1649,7 +1649,7 @@ class CenterCrop(RandomCrop):
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class ThreeCrop:
     """Crop images into three crops.
 
@@ -1722,7 +1722,7 @@ class ThreeCrop:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class TenCrop:
     """Crop the images into 10 crops (corner + center + flip).
 
@@ -1794,7 +1794,7 @@ class TenCrop:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class AudioAmplify:
     """Amplify the waveform.
 
@@ -1830,7 +1830,7 @@ class AudioAmplify:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class MelSpectrogram:
     """MelSpectrogram. Transfer an audio wave into a melspectogram figure.
 

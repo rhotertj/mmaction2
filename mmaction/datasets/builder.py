@@ -27,7 +27,7 @@ if platform.system() != 'Windows':
     resource.setrlimit(resource.RLIMIT_NOFILE, (soft_limit, hard_limit))
 
 DATASETS = Registry('dataset', parent=MMEngine_DATASETS)
-PIPELINES = Registry('pipeline', parent=MMEngine_TRANSFORMS)
+TRANSFORMS = Registry('pipeline', parent=MMEngine_TRANSFORMS)
 BLENDINGS = Registry('blending')
 
 

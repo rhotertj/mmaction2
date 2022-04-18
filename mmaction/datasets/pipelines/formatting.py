@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from mmcv.parallel import DataContainer as DC
 
-from ..builder import PIPELINES
+from ..builder import TRANSFORMS
 
 
 def to_tensor(data):
@@ -28,7 +28,7 @@ def to_tensor(data):
     raise TypeError(f'type {type(data)} cannot be converted to tensor.')
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class ToTensor:
     """Convert some values in results dict to `torch.Tensor` type in data
     loader pipeline.
@@ -55,7 +55,7 @@ class ToTensor:
         return f'{self.__class__.__name__}(keys={self.keys})'
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class Rename:
     """Rename the key in results.
 
@@ -80,7 +80,7 @@ class Rename:
         return results
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class ToDataContainer:
     """Convert the data to DataContainer.
 
@@ -116,7 +116,7 @@ class ToDataContainer:
         return self.__class__.__name__ + f'(fields={self.fields})'
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class ImageToTensor:
     """Convert image type to `torch.Tensor` type.
 
@@ -142,7 +142,7 @@ class ImageToTensor:
         return f'{self.__class__.__name__}(keys={self.keys})'
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class Transpose:
     """Transpose image channels to a given order.
 
@@ -171,7 +171,7 @@ class Transpose:
                 f'keys={self.keys}, order={self.order})')
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class Collect:
     """Collect data from the loader relevant to the specific task.
 
@@ -249,7 +249,7 @@ class Collect:
                 f'nested={self.nested})')
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class FormatShape:
     """Format final imgs shape to the given input_format.
 
@@ -336,7 +336,7 @@ class FormatShape:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class FormatAudioShape:
     """Format final audio shape to the given input_format.
 
@@ -374,7 +374,7 @@ class FormatAudioShape:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class JointToBone:
     """Convert the joint information to bone information.
 
@@ -434,7 +434,7 @@ class JointToBone:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class FormatGCNInput:
     """Format final skeleton shape to the given input_format.
 

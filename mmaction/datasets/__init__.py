@@ -7,7 +7,7 @@ from .ava_dataset import AVADataset
 from .base import BaseDataset
 from .blending_utils import (BaseMiniBatchBlending, CutmixBlending,
                              MixupBlending)
-from .builder import (BLENDINGS, DATASETS, PIPELINES, build_dataloader,
+from .builder import (BLENDINGS, DATASETS, TRANSFORMS, build_dataloader,
                       build_dataset)
 from .dataset_wrappers import ConcatDataset, RepeatDataset
 from .hvu_dataset import HVUDataset
@@ -24,5 +24,5 @@ __all__ = [
     'HVUDataset', 'AudioDataset', 'AudioFeatureDataset', 'ImageDataset',
     'RawVideoDataset', 'AVADataset', 'AudioVisualDataset',
     'BaseMiniBatchBlending', 'CutmixBlending', 'MixupBlending', 'DATASETS',
-    'PIPELINES', 'BLENDINGS', 'PoseDataset', 'ConcatDataset'
+    'TRANSFORMS', 'BLENDINGS', 'PoseDataset', 'ConcatDataset'
 ]

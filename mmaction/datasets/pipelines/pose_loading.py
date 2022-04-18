@@ -6,11 +6,11 @@ import numpy as np
 from mmcv.fileio import FileClient
 from scipy.stats import mode
 
-from ..builder import PIPELINES
+from ..builder import TRANSFORMS
 from .augmentations import Flip
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class UniformSampleFrames:
     """Uniformly sample frames from the video.
 
@@ -138,7 +138,7 @@ class UniformSampleFrames:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class PoseDecode:
     """Load and decode pose with given indices.
 
@@ -196,7 +196,7 @@ class PoseDecode:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class LoadKineticsPose:
     """Load Kinetics Pose given filename (The format should be pickle)
 
@@ -345,7 +345,7 @@ class LoadKineticsPose:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class GeneratePoseTarget:
     """Generate pseudo heatmaps based on joint coordinates and confidence.
 
@@ -631,7 +631,7 @@ class GeneratePoseTarget:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class PaddingWithLoop:
     """Sample frames from the video.
 
@@ -666,7 +666,7 @@ class PaddingWithLoop:
         return results
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class PoseNormalize:
     """Normalize the range of keypoint values to [-1,1].
 

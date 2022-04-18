@@ -13,10 +13,10 @@ from mmcv.fileio import FileClient
 from torch.nn.modules.utils import _pair
 
 from ...utils import get_random_string, get_shm_dir, get_thread_id
-from ..builder import PIPELINES
+from ..builder import TRANSFORMS
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class LoadHVULabel:
     """Convert the HVU label from dictionaries to torch tensors.
 
@@ -79,7 +79,7 @@ class LoadHVULabel:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class SampleFrames:
     """Sample frames from the video.
 
@@ -270,7 +270,7 @@ class SampleFrames:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class UntrimmedSampleFrames:
     """Sample frames from the untrimmed video.
 
@@ -329,7 +329,7 @@ class UntrimmedSampleFrames:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class DenseSampleFrames(SampleFrames):
     """Select frames from the video by dense sample strategy.
 
@@ -421,7 +421,7 @@ class DenseSampleFrames(SampleFrames):
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class SampleAVAFrames(SampleFrames):
 
     def __init__(self, clip_len, frame_interval=2, test_mode=False):
@@ -467,7 +467,7 @@ class SampleAVAFrames(SampleFrames):
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class SampleProposalFrames(SampleFrames):
     """Sample frames from proposals in the video.
 
@@ -723,7 +723,7 @@ class SampleProposalFrames(SampleFrames):
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class PyAVInit:
     """Using pyav to initialize the video.
 
@@ -772,7 +772,7 @@ class PyAVInit:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class PyAVDecode:
     """Using PyAV to decode the video.
 
@@ -865,7 +865,7 @@ class PyAVDecode:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class PIMSInit:
     """Use PIMS to initialize the video.
 
@@ -917,7 +917,7 @@ class PIMSInit:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class PIMSDecode:
     """Using PIMS to decode the videos.
 
@@ -946,7 +946,7 @@ class PIMSDecode:
         return results
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class PyAVDecodeMotionVector(PyAVDecode):
     """Using pyav to decode the motion vectors from video.
 
@@ -1024,7 +1024,7 @@ class PyAVDecodeMotionVector(PyAVDecode):
         return results
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class DecordInit:
     """Using decord to initialize the video_reader.
 
@@ -1075,7 +1075,7 @@ class DecordInit:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class DecordDecode:
     """Using decord to decode the video.
 
@@ -1136,7 +1136,7 @@ class DecordDecode:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class OpenCVInit:
     """Using OpenCV to initialize the video_reader.
 
@@ -1197,7 +1197,7 @@ class OpenCVInit:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class OpenCVDecode:
     """Using OpenCV to decode the video.
 
@@ -1239,7 +1239,7 @@ class OpenCVDecode:
         return results
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class RawFrameDecode:
     """Load and decode frames with given indices.
 
@@ -1340,7 +1340,7 @@ class RawFrameDecode:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class ArrayDecode:
     """Load and decode frames with given indices from a 4D array.
 
@@ -1387,7 +1387,7 @@ class ArrayDecode:
         return f'{self.__class__.__name__}()'
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class ImageDecode:
     """Load and decode images.
 
@@ -1433,7 +1433,7 @@ class ImageDecode:
         return results
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class AudioDecodeInit:
     """Using librosa to initialize the audio reader.
 
@@ -1505,7 +1505,7 @@ class AudioDecodeInit:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class LoadAudioFeature:
     """Load offline extracted audio features.
 
@@ -1552,7 +1552,7 @@ class LoadAudioFeature:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class AudioDecode:
     """Sample the audio w.r.t. the frames selected.
 
@@ -1603,7 +1603,7 @@ class AudioDecode:
         return results
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class BuildPseudoClip:
     """Build pseudo clips with one single image by repeating it n times.
 
@@ -1633,7 +1633,7 @@ class BuildPseudoClip:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class AudioFeatureSelector:
     """Sample the audio feature w.r.t. the frames selected.
 
@@ -1694,7 +1694,7 @@ class AudioFeatureSelector:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class LoadLocalizationFeature:
     """Load Video features for localizer with given video_name list.
 
@@ -1735,7 +1735,7 @@ class LoadLocalizationFeature:
         return repr_str
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class GenerateLocalizationLabels:
     """Load video label for localizer with given video_name list.
 
@@ -1770,7 +1770,7 @@ class GenerateLocalizationLabels:
         return results
 
 
-@PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class LoadProposals:
     """Loading proposals with given proposal results.
 
