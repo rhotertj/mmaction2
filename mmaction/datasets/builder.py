@@ -5,9 +5,14 @@ from functools import partial
 
 import numpy as np
 import torch
+
+from mmengine import TRANSFORMS as MMEngine_TRANSFORMS
+from mmengine.registry import DATASETS as MMEngine_DATASETS
+from mmengine.registry import Registry
+
 from mmcv.parallel import collate
 from mmcv.runner import get_dist_info
-from mmcv.utils import Registry, build_from_cfg, digit_version
+from mmcv.utils import build_from_cfg, digit_version
 from torch.utils.data import DataLoader
 
 from ..utils.multigrid import ShortCycleSampler
@@ -21,8 +26,8 @@ if platform.system() != 'Windows':
     soft_limit = min(4096, hard_limit)
     resource.setrlimit(resource.RLIMIT_NOFILE, (soft_limit, hard_limit))
 
-DATASETS = Registry('dataset')
-PIPELINES = Registry('pipeline')
+DATASETS = Registry('dataset', parent=MMEngine_DATASETS)
+PIPELINES = Registry('pipeline', parent=MMEngine_TRANSFORMS)
 BLENDINGS = Registry('blending')
 
 

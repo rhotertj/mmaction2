@@ -14,8 +14,9 @@ model = dict(
     test_cfg=None)
 
 dataset_type = 'PoseDataset'
-ann_file_train = 'data/ntu/nturgb+d_skeletons_60_3d_nmtvc/xsub/train.pkl'
-ann_file_val = 'data/ntu/nturgb+d_skeletons_60_3d_nmtvc/xsub/val.pkl'
+ann_file_train = 'data/ntu60_xsub/train.pkl'
+ann_file_val = 'data/ntu60_xsub/val.pkl'
+
 train_pipeline = [
     dict(type='PaddingWithLoop', clip_len=300),
     dict(type='PoseDecode'),
@@ -30,32 +31,31 @@ val_pipeline = [
     dict(type='Collect', keys=['keypoint', 'label'], meta_keys=[]),
     dict(type='ToTensor', keys=['keypoint'])
 ]
-test_pipeline = [
-    dict(type='PaddingWithLoop', clip_len=300),
-    dict(type='PoseDecode'),
-    dict(type='FormatGCNInput', input_format='NCTVM'),
-    dict(type='Collect', keys=['keypoint', 'label'], meta_keys=[]),
-    dict(type='ToTensor', keys=['keypoint'])
-]
-data = dict(
-    videos_per_gpu=32,
-    workers_per_gpu=2,
-    test_dataloader=dict(videos_per_gpu=1),
-    train=dict(
+
+train_dataloader = dict(
+    batch_size=32,
+    num_workers=2,
+    persistent_workers=True,
+    dataset=dict(
         type=dataset_type,
         ann_file=ann_file_train,
-        data_prefix='',
-        pipeline=train_pipeline),
-    val=dict(
+        pipeline=train_pipeline))
+val_dataloader = dict(
+    batch_size=32,
+    num_workers=2,
+    persistent_workers=True,
+    dataset=dict(
         type=dataset_type,
         ann_file=ann_file_val,
-        data_prefix='',
-        pipeline=val_pipeline),
-    test=dict(
+        pipeline=val_pipeline))
+test_dataloader = dict(
+    batch_size=1,
+    num_workers=2,
+    persistent_workers=True,
+    dataset=dict(
         type=dataset_type,
         ann_file=ann_file_val,
-        data_prefix='',
-        pipeline=test_pipeline))
+        pipeline=val_pipeline))
 
 # optimizer
 optimizer = dict(
