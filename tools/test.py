@@ -9,7 +9,7 @@ import torch
 from mmcv import Config, DictAction
 from mmcv.cnn import fuse_conv_bn
 from mmcv.fileio.io import file_handlers
-from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
+from mmengine.model import MMDataParallel, MMDistributedDataParallel
 from mmcv.runner import get_dist_info, init_dist, load_checkpoint
 from mmcv.runner.fp16_utils import wrap_fp16_model
 
