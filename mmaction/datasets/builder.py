@@ -9,6 +9,8 @@ import torch
 from mmengine import TRANSFORMS as MMEngine_TRANSFORMS
 from mmengine.registry import DATASETS as MMEngine_DATASETS
 from mmengine.registry import Registry
+from mmengine import DefaultScope
+default_scope = DefaultScope.get_instance('mmengine', scope_name='mmaction')
 
 from mmcv.parallel import collate
 from mmcv.runner import get_dist_info
@@ -27,7 +29,7 @@ if platform.system() != 'Windows':
     resource.setrlimit(resource.RLIMIT_NOFILE, (soft_limit, hard_limit))
 
 DATASETS = Registry('dataset', parent=MMEngine_DATASETS)
-TRANSFORMS = Registry('pipeline', parent=MMEngine_TRANSFORMS)
+TRANSFORMS = Registry('transforms', parent=MMEngine_TRANSFORMS)
 BLENDINGS = Registry('blending')
 
 
