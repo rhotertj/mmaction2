@@ -49,24 +49,17 @@ class PoseDataset(BaseDataset):
         logger = get_root_logger()
         logger.info(f'{len(self)} videos remain after valid thresholding')
 
-    def load_data_list(self):
+    def load_data_list(self, ann_file):
         """Load annotation file to get video information."""
-        assert self.ann_file.endswith('.pkl')
-        return self.load_pkl_annotations()
+        assert ann_file.endswith('.pkl')
+        return self.load_pkl_annotations(ann_file)
 
-    def load_pkl_annotations(self):
-        data = mmcv.load(self.ann_file)
+    def load_pkl_annotations(self, ann_file):
+        data = mmcv.load(ann_file)
 
         if self.split:
             split, data = data['split'], data['annotations']
             identifier = 'filename' if 'filename' in data[0] else 'frame_dir'
             data = [x for x in data if x[identifier] in split[self.split]]
-
-        for item in data:
-            # Sometimes we may need to load anno from the file
-            if 'filename' in item:
-                item['filename'] = osp.join(self.data_prefix, item['filename'])
-            if 'frame_dir' in item:
-                item['frame_dir'] = osp.join(self.data_prefix,
-                                             item['frame_dir'])
+            
         return data

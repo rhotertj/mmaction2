@@ -488,3 +488,30 @@ class FormatGCNInput:
         repr_str = self.__class__.__name__
         repr_str += f"(input_format='{self.input_format}')"
         return repr_str
+
+from mmaction.core import SkeDataSample
+
+@TRANSFORMS.register_module()
+class PackSkeInputs:
+
+    mapping_table = {'keypoint': 'inputs'}
+
+    def __init__(self, keys=('label'), meta_keys=()):
+        self.keys = keys
+        self.meta_keys = meta_keys
+
+    def __call__(self, results: dict) -> dict:
+        packed_results = dict()
+        if 'keypoint' in results:
+            keypoint = results['keypoint']
+            packed_results['inputs'] = to_tensor(keypoint)
+
+        data_sample = SkeDataSample()
+        data_sample.label = results['label']
+        packed_results['data_sample'] = data_sample
+        return packed_results
+
+    def __repr__(self) -> str:
+        repr_str = self.__class__.__name__
+        repr_str += f'(keys={self.keys}, meta_keys={self.meta_keys})'
+        return repr_str
