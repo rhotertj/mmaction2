@@ -48,8 +48,10 @@ class SkeletonGCN(nn.Module, metaclass=ABCMeta):
         assert self.with_cls_head
         losses = dict()
 
-        x = self.extract_feat(skeletons)
+        x = self.extract_feat(inputs)
         output = self.cls_head(x)
+        gt_labels = [x.label for x in data_samples]
+        gt_labels = torch.Tensor(gt_labels).to(x.device)
         gt_labels = labels.squeeze(-1)
         loss = self.cls_head.loss(output, gt_labels)
         losses.update(loss)
@@ -58,20 +60,16 @@ class SkeletonGCN(nn.Module, metaclass=ABCMeta):
 
     def forward_test(self, inputs):
         """Defines the computation performed at every call when evaluation and testing."""
-        x = self.extract_feat(skeletons)
+        x = self.extract_feat(inputs)
         assert self.with_cls_head
         output = self.cls_head(x)
-
         return output.data.cpu().numpy()
 
-    def forward(self, inputs, label=None, return_loss=True, **kwargs):
+    def forward(self, inputs, data_samples, return_loss=True):
         """Define the computation performed at every call."""
         if return_loss:
-            if label is None:
-                raise ValueError('Label should not be None.')
-            return self.forward_train(keypoint, label, **kwargs)
-
-        return self.forward_test(keypoint, **kwargs)
+            return self.forward_train(inputs, data_samples)
+        return self.forward_test(inputs, data_samples)
 
     def extract_feat(self, skeletons):
         x = self.backbone(skeletons)
