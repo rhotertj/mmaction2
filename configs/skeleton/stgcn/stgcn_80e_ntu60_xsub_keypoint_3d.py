@@ -21,15 +21,13 @@ train_pipeline = [
     dict(type='PaddingWithLoop', clip_len=300),
     dict(type='PoseDecode'),
     dict(type='FormatGCNInput', input_format='NCTVM'),
-    dict(type='Collect', keys=['keypoint', 'label'], meta_keys=[]),
-    dict(type='ToTensor', keys=['keypoint'])
+    dict(type='PackSkeInputs')
 ]
 val_pipeline = [
     dict(type='PaddingWithLoop', clip_len=300),
     dict(type='PoseDecode'),
     dict(type='FormatGCNInput', input_format='NCTVM'),
-    dict(type='Collect', keys=['keypoint', 'label'], meta_keys=[]),
-    dict(type='ToTensor', keys=['keypoint'])
+    dict(type='PackSkeInputs')
 ]
 
 train_dataloader = dict(
@@ -57,21 +55,39 @@ test_dataloader = dict(
         ann_file=ann_file_val,
         pipeline=val_pipeline))
 
-# optimizer
-optimizer = dict(
-    type='SGD', lr=0.1, momentum=0.9, weight_decay=0.0001, nesterov=True)
-optimizer_config = dict(grad_clip=None)
-# learning policy
-lr_config = dict(policy='step', step=[10, 50])
-total_epochs = 80
-checkpoint_config = dict(interval=3)
-evaluation = dict(interval=3, metrics=['top_k_accuracy'])
-log_config = dict(interval=100, hooks=[dict(type='TextLoggerHook')])
-
 # runtime settings
-dist_params = dict(backend='nccl')
-log_level = 'INFO'
 work_dir = './work_dirs/stgcn_80e_ntu60_xsub_keypoint_3d/'
-load_from = None
-resume_from = None
 workflow = [('train', 1)]
+
+custom_imports = dict(imports=['mmcv.transforms'], allow_failed_imports=False)
+# 设置 registry 默认的 scope 为当前 repo，如 MMDet 中应当设置 mmdet
+default_scope = 'mmaction'
+
+env_cfg = dict(
+    cudnn_benchmark=False,
+    mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
+    dist_cfg=dict(backend='nccl'),
+)
+
+default_hooks = dict(
+    optimizer=dict(type='OptimizerHook', grad_clip=None),
+    timer=dict(type='IterTimerHook'),
+    logger=dict(type='LoggerHook', interval=50),
+    param_scheduler=dict(type='ParamSchedulerHook'),
+    checkpoint=dict(type='CheckpointHook', interval=5)
+)
+
+train_cfg = dict(by_epoch=True, max_epochs=80)
+val_cfg = dict(interval=1)
+test_cfg = dict()
+
+param_scheduler = [
+    dict(type='MultiStepLR', epoch_interval=(0, 80), by_epoch=True, milestones=[10, 50], gamma=0.1)
+]
+
+optimizer = dict(type='SGD', lr=0.1, momentum=0.9, weight_decay=0.0001, nesterov=True)
+
+log_level = 'INFO'
+load_from = None
+resume = False
+resume_from = None

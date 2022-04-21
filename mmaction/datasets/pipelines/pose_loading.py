@@ -4,6 +4,7 @@ import pickle
 
 import numpy as np
 from mmcv.fileio import FileClient
+from mmcv.transforms.base import BaseTransform
 from scipy.stats import mode
 
 from ..builder import TRANSFORMS
@@ -139,7 +140,7 @@ class UniformSampleFrames:
 
 
 @TRANSFORMS.register_module()
-class PoseDecode:
+class PoseDecode(BaseTransform):
     """Load and decode pose with given indices.
 
     Required keys are "keypoint", "frame_inds" (optional), "keypoint_score"
@@ -169,7 +170,7 @@ class PoseDecode:
 
         return [x[frame_inds].astype(np.float32) for x in kpscore]
 
-    def __call__(self, results):
+    def transform(self, results):
 
         if 'frame_inds' not in results:
             results['frame_inds'] = np.arange(results['total_frames'])
@@ -632,7 +633,7 @@ class GeneratePoseTarget:
 
 
 @TRANSFORMS.register_module()
-class PaddingWithLoop:
+class PaddingWithLoop(BaseTransform):
     """Sample frames from the video.
 
     To sample an n-frame clip from the video, PaddingWithLoop samples
@@ -652,7 +653,7 @@ class PaddingWithLoop:
         self.clip_len = clip_len
         self.num_clips = num_clips
 
-    def __call__(self, results):
+    def transform(self, results):
         num_frames = results['total_frames']
 
         start = 0

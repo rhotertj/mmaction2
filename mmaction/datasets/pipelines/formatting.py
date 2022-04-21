@@ -5,6 +5,7 @@ import mmcv
 import numpy as np
 import torch
 from mmcv.parallel import DataContainer as DC
+from mmcv.transforms.base import BaseTransform
 
 from ..builder import TRANSFORMS
 
@@ -435,7 +436,7 @@ class JointToBone:
 
 
 @TRANSFORMS.register_module()
-class FormatGCNInput:
+class FormatGCNInput(BaseTransform):
     """Format final skeleton shape to the given input_format.
 
     Required keys are "keypoint" and "keypoint_score"(optional),
@@ -452,7 +453,7 @@ class FormatGCNInput:
                 f'The input format {self.input_format} is invalid.')
         self.num_person = num_person
 
-    def __call__(self, results):
+    def transform(self, results):
         """Performs the FormatShape formatting.
 
         Args:
@@ -492,7 +493,7 @@ class FormatGCNInput:
 from mmaction.core import SkeDataSample
 
 @TRANSFORMS.register_module()
-class PackSkeInputs:
+class PackSkeInputs(BaseTransform):
 
     mapping_table = {'keypoint': 'inputs'}
 
@@ -500,7 +501,7 @@ class PackSkeInputs:
         self.keys = keys
         self.meta_keys = meta_keys
 
-    def __call__(self, results: dict) -> dict:
+    def transform(self, results: dict) -> dict:
         packed_results = dict()
         if 'keypoint' in results:
             keypoint = results['keypoint']

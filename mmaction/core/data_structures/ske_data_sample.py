@@ -1,5 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from mmengine.data import BaseDataElement, InstanceData
+from mmengine.data import BaseDataElement
 
 
 class SkeDataSample(BaseDataElement):
@@ -10,7 +10,7 @@ class SkeDataSample(BaseDataElement):
 
     @label.setter
     def label(self, value):
-        self.set_field(value, '_label', dtype=InstanceData)
+        self.set_field(value, '_label')
 
     @label.deleter
     def label(self):
@@ -22,7 +22,7 @@ class SkeDataSample(BaseDataElement):
 
     @frame_dir.setter
     def frame_dir(self, value):
-        self.set_field(value, '_frame_dir', dtype=InstanceData)
+        self.set_field(value, '_frame_dir')
 
     @frame_dir.deleter
     def frame_dir(self):
