@@ -509,6 +509,7 @@ class PackSkeInputs(BaseTransform):
 
         data_sample = SkeDataSample()
         data_sample.label = results['label']
+        data_sample.frame_dir = results['frame_dir']
         packed_results['data_sample'] = data_sample
         return packed_results
 
