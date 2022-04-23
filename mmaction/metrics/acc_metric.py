@@ -40,12 +40,15 @@ class AccMetric(BaseMetric):
             predictions (Sequence[dict]): A batch of outputs from
                 the model.
         """
+        # print(data_batch, predictions, type(data_batch), type(predictions))
         for (_, data_sample), pred in zip(data_batch, predictions):
             # TODO: directly convert to json here?
             result = dict()
+
+            # print(len(data_sample), data_sample, pred)
             result['frame_dir'] = data_sample['frame_dir']
             result['label'] = data_sample['label']
-            result['pred'] = pred.cpu().numpy()
+            result['pred'] = pred
             self.results.append(result)
 
     def compute_metrics(self, results: list) -> dict:

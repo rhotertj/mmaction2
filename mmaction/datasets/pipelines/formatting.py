@@ -511,7 +511,7 @@ class PackSkeInputs(BaseTransform):
         data_sample.label = results['label']
         data_sample.frame_dir = results['frame_dir']
         packed_results['data_sample'] = data_sample
-        return packed_results
+        return packed_results['inputs'], packed_results['data_sample']
 
     def __repr__(self) -> str:
         repr_str = self.__class__.__name__

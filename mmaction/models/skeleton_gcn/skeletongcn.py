@@ -5,11 +5,15 @@ from collections import OrderedDict
 import torch
 import torch.distributed as dist
 import torch.nn as nn
+from mmaction.core import stack_batch
+from mmcv.runner import BaseModule
 
 from .. import builder
+from ..builder import RECOGNIZERS
 
 
-class SkeletonGCN(nn.Module, metaclass=ABCMeta):
+@RECOGNIZERS.register_module()
+class SkeletonGCN(BaseModule, metaclass=ABCMeta):
     """Base class for GCN-based action recognition.
 
     Args:
@@ -26,10 +30,15 @@ class SkeletonGCN(nn.Module, metaclass=ABCMeta):
         self.backbone_from = 'mmaction2'
         self.backbone = builder.build_backbone(backbone)
         self.cls_head = builder.build_head(cls_head) if cls_head else None
-
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
+
+        self.register_buffer('flag', torch.tensor([1.]), False)
         self.init_weights()
+
+    @property
+    def device(self):
+        return self.flag.device
 
     @property
     def with_cls_head(self):
@@ -51,8 +60,8 @@ class SkeletonGCN(nn.Module, metaclass=ABCMeta):
         x = self.extract_feat(inputs)
         output = self.cls_head(x)
         gt_labels = [x.label for x in data_samples]
-        gt_labels = torch.Tensor(gt_labels).to(x.device)
-        gt_labels = labels.squeeze(-1)
+        gt_labels = torch.Tensor(gt_labels).to(x.device).type(torch.long)
+        gt_labels = gt_labels.squeeze(-1)
         loss = self.cls_head.loss(output, gt_labels)
         losses.update(loss)
 
@@ -65,11 +74,35 @@ class SkeletonGCN(nn.Module, metaclass=ABCMeta):
         output = self.cls_head(x)
         return output.data.cpu().numpy()
 
-    def forward(self, inputs, data_samples, return_loss=True):
+    def forward(self, data_batch, return_loss=True):
         """Define the computation performed at every call."""
+        inputs, data_samples = self.preprocess_data2(data_batch)
         if return_loss:
-            return self.forward_train(inputs, data_samples)
-        return self.forward_test(inputs, data_samples)
+            ret = self.forward_train(inputs, data_samples)
+            loss, log_vars = self._parse_losses(ret)
+            outputs = dict(loss=loss, log_vars=log_vars, num_samples=len(data_batch))
+            return outputs
+        return self.forward_test(inputs)
+        
+    def preprocess_data(self, data):
+        inputs = [data_['inputs'] for data_ in data]
+        data_samples = [data_['data_sample'] for data_ in data]
+
+        data_samples = [data_sample.to(self.device) for data_sample in data_samples]
+        inputs = [input.to(self.device) for input in inputs]
+        batch_inputs = stack_batch(inputs)
+
+        return batch_inputs, data_samples
+
+    def preprocess_data2(self, data):
+        inputs = [data_[0] for data_ in data]
+        data_samples = [data_[1] for data_ in data]
+
+        data_samples = [data_sample.to(self.device) for data_sample in data_samples]
+        inputs = [input.to(self.device) for input in inputs]
+        batch_inputs = stack_batch(inputs)
+        
+        return batch_inputs, data_samples
 
     def extract_feat(self, skeletons):
         x = self.backbone(skeletons)
@@ -112,42 +145,7 @@ class SkeletonGCN(nn.Module, metaclass=ABCMeta):
         return loss, log_vars
 
     def train_step(self, data_batch, optimizer, **kwargs):
-        """The iteration step during training.
-
-        This method defines an iteration step during training, except for the
-        back propagation and optimizer updating, which are done in an optimizer
-        hook. Note that in some complicated cases or models, the whole process
-        including back propagation and optimizer updating is also defined in
-        this method, such as GAN.
-
-        Args:
-            data_batch (dict): The output of dataloader.
-            optimizer (:obj:`torch.optim.Optimizer` | dict): The optimizer of
-                runner is passed to ``train_step()``. This argument is unused
-                and reserved.
-
-        Returns:
-            dict: It should contain at least 3 keys: ``loss``, ``log_vars``,
-                ``num_samples``.
-                ``loss`` is a tensor for back propagation, which can be a
-                weighted sum of multiple losses.
-                ``log_vars`` contains all the variables to be sent to the
-                logger.
-                ``num_samples`` indicates the batch size (when the model is
-                DDP, it means the batch size on each GPU), which is used for
-                averaging the logs.
-        """
-        skeletons = data_batch['keypoint']
-        label = data_batch['label']
-        label = label.squeeze(-1)
-
-        losses = self(skeletons, label, return_loss=True)
-
-        loss, log_vars = self._parse_losses(losses)
-        outputs = dict(
-            loss=loss, log_vars=log_vars, num_samples=len(skeletons.data))
-
-        return outputs
+        return self(data_batch, return_loss=True)
 
     def val_step(self, data_batch, optimizer, **kwargs):
         """The iteration step during validation.
@@ -156,13 +154,4 @@ class SkeletonGCN(nn.Module, metaclass=ABCMeta):
         during val epochs. Note that the evaluation after training epochs is
         not implemented with this method, but an evaluation hook.
         """
-        skeletons = data_batch['keypoint']
-        label = data_batch['label']
-
-        losses = self(skeletons, label, return_loss=True)
-
-        loss, log_vars = self._parse_losses(losses)
-        outputs = dict(
-            loss=loss, log_vars=log_vars, num_samples=len(skeletons.data))
-
-        return outputs
+        return self(data_batch, return_loss=False)
