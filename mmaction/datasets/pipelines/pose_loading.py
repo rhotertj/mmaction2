@@ -668,7 +668,7 @@ class PaddingWithLoop(BaseTransform):
 
 
 @TRANSFORMS.register_module()
-class PoseNormalize:
+class PoseNormalize(BaseTransform):
     """Normalize the range of keypoint values to [-1,1].
 
     Args:
@@ -687,7 +687,7 @@ class PoseNormalize:
         self.max_value = np.array(
             max_value, dtype=np.float32).reshape(-1, 1, 1, 1)
 
-    def __call__(self, results):
+    def transform(self, results):
         keypoint = results['keypoint']
         keypoint = (keypoint - self.mean) / (self.max_value - self.min_value)
         results['keypoint'] = keypoint
