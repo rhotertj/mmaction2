@@ -3,17 +3,46 @@ import copy as cp
 import io
 import os
 import os.path as osp
+from pathlib import Path
 import shutil
 import warnings
 
 import mmcv
 import numpy as np
+import cv2
 import torch
 from mmcv.fileio import FileClient
 from torch.nn.modules.utils import _pair
 
 from ...utils import get_random_string, get_shm_dir, get_thread_id
 from ..builder import PIPELINES
+
+@PIPELINES.register_module()
+class LoadFrameSequence:
+    """
+    Custom: Load a sequence of frames of length seq_len.
+    The frames are taken from a provided image path and its subsequent images by filename.
+    """
+
+    def __init__(self, seq_len) -> None:
+        self.seq_len = seq_len
+
+    def __call__(self, results):
+        # get dataframe from results
+        assert results.get("imgs", None) is None
+        results["imgs"] = []
+        img_dir = Path(osp.dirname(results["file"]))
+        frame_index = results["t_start"]
+        for idx in range(frame_index, frame_index + self.seq_len):
+            frame_path = str(img_dir / f"{str(idx).rjust(6, '0')}.jpg")
+            img = cv2.imread(frame_path, cv2.IMREAD_COLOR) # rgb
+            results["imgs"].append(img)
+        assert len(results['imgs']) == self.seq_len
+        # print(type(results["imgs"]))
+        results["imgs"] = np.stack(results["imgs"])
+        # print((results["imgs"].shape))
+        assert isinstance(results["imgs"], np.ndarray)
+        return results
 
 
 @PIPELINES.register_module()
