@@ -24,22 +24,44 @@ class LoadFrameSequence:
     The frames are taken from a provided image path and its subsequent images by filename.
     """
 
-    def __init__(self, seq_len) -> None:
+    def __init__(self, seq_len, step_size=1, sample_before=0) -> None:
         self.seq_len = seq_len
+        self.step_size = step_size
+        self.sample_before = sample_before
 
     def __call__(self, results):
         # get dataframe from results
-        assert results.get("imgs", None) is None
+        assert "imgs" not in results
         results["imgs"] = []
         img_dir = Path(osp.dirname(results["file"]))
         frame_index = results["t_start"]
-        for idx in range(frame_index, frame_index + self.seq_len):
+        if self.sample_before > 0:
+            start = frame_index - (self.sample_before * self.step_size)
+            end = frame_index + ((self.seq_len - self.sample_before) * self.step_size)
+            iter = range(start, end, self.step_size)
+        else:
+            range(frame_index, frame_index + self.seq_len * self.step_size, self.step_size)
+        for idx in iter:
             frame_path = str(img_dir / f"{str(idx).rjust(6, '0')}.jpg")
-            img = cv2.imread(frame_path, cv2.IMREAD_COLOR) # rgb
+            try:
+                img = cv2.imread(frame_path)
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                img = cv2.resize(img, (224,224))
+            except:
+                print("ERROR WITH", frame_path)
+                img = np.zeros((224, 224, 3))
+            
             results["imgs"].append(img)
+            results["img_shape"] = img.shape[:2]
         assert len(results['imgs']) == self.seq_len
-        # print(type(results["imgs"]))
-        results["imgs"] = np.stack(results["imgs"])
+        # stack frames
+        x = np.stack(results["imgs"])
+        # add batch dim
+        # results["imgs"] = np.transpose(x, axes=(3, 0, 1, 2)).astype(np.float32)
+        x = np.expand_dims(x, axis=0)
+        # # order (batch x channels x frames x height x width)
+        results["imgs"] = np.transpose(x, axes=(0, 4, 1, 2, 3)).astype(np.float32)
+        results["label"] = int(results["label"])
         # print((results["imgs"].shape))
         assert isinstance(results["imgs"], np.ndarray)
         return results
