@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from mmaction.datasets.frame_seq_dataset import FrameSequenceDataset
 from .activitynet_dataset import ActivityNetDataset
 from .audio_dataset import AudioDataset
 from .audio_feature_dataset import AudioFeatureDataset
@@ -24,5 +25,5 @@ __all__ = [
     'HVUDataset', 'AudioDataset', 'AudioFeatureDataset', 'ImageDataset',
     'RawVideoDataset', 'AVADataset', 'AudioVisualDataset',
     'BaseMiniBatchBlending', 'CutmixBlending', 'MixupBlending', 'DATASETS',
-    'PIPELINES', 'BLENDINGS', 'PoseDataset', 'ConcatDataset'
+    'PIPELINES', 'BLENDINGS', 'PoseDataset', 'ConcatDataset', 'FrameSequenceDataset'
 ]
