@@ -33,6 +33,10 @@ class LoadFrameSequence:
         # get dataframe from results
         assert "imgs" not in results
         results["imgs"] = []
+        # needed by FormatShape
+        results["clip_len"] = self.seq_len
+        results["num_clips"] = 1
+        
         img_dir = Path(osp.dirname(results["file"]))
         frame_index = results["t_start"]
         if self.sample_before > 0:
@@ -46,7 +50,7 @@ class LoadFrameSequence:
             try:
                 img = cv2.imread(frame_path)
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                img = cv2.resize(img, (224,224))
+                # img = cv2.resize(img, (224,224))
             except:
                 print("ERROR WITH", frame_path)
                 img = np.zeros((224, 224, 3))
@@ -55,15 +59,15 @@ class LoadFrameSequence:
             results["img_shape"] = img.shape[:2]
         assert len(results['imgs']) == self.seq_len
         # stack frames
-        x = np.stack(results["imgs"])
+        # x = np.stack(results["imgs"])
         # add batch dim
         # results["imgs"] = np.transpose(x, axes=(3, 0, 1, 2)).astype(np.float32)
-        x = np.expand_dims(x, axis=0)
+        # x = np.expand_dims(x, axis=0)
         # # order (batch x channels x frames x height x width)
-        results["imgs"] = np.transpose(x, axes=(0, 4, 1, 2, 3)).astype(np.float32)
+        # results["imgs"] = np.transpose(x, axes=(0, 4, 1, 2, 3)).astype(np.float32)
         results["label"] = int(results["label"])
         # print((results["imgs"].shape))
-        assert isinstance(results["imgs"], np.ndarray)
+        # assert isinstance(results["imgs"], np.ndarray)
         return results
 
 
